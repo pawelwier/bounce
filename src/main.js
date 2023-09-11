@@ -1,88 +1,78 @@
-import { WebGLRenderer, Scene, PerspectiveCamera, AxesHelper,
-  BoxGeometry, MeshBasicMaterial, Mesh, PlaneGeometry, GridHelper, DoubleSide, SphereGeometry,
+import { WebGLRenderer, Scene, PerspectiveCamera, AxesHelper, AmbientLight, MeshStandardMaterial,
+  Mesh, PlaneGeometry, GridHelper, DoubleSide, SphereGeometry, DirectionalLight, Raycaster, Vector2
  } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import * as dat from 'dat.gui'
+import { onClick } from './utils/listeners'
+import { createSphere, isSphere, sphereCb } from './utils/geometry'
 
 const { innerWidth, innerHeight } = window
 
 const renderer = new WebGLRenderer()
+const raycaster = new Raycaster()
+const scene = new Scene()
+const pointer = new Vector2()
+const camera = new PerspectiveCamera(
+  45,
+  innerWidth / innerHeight,
+  0.1,
+  1000
+)
+const orbitControls = new OrbitControls(camera, renderer.domElement)
+const axesHelper = new AxesHelper(20)
+const gridHelper = new GridHelper(30, 30)
 
 renderer.setSize(innerWidth, innerHeight)
 
 document.body.appendChild(renderer.domElement)
 
-const scene = new Scene()
-
-const camera = new PerspectiveCamera(
-  40,
-  innerWidth / innerHeight,
-  0.1,
-  1000
-)
-
-const orbitControls = new OrbitControls(camera, renderer.domElement)
+camera.position.set(-10, 30, 30)
 orbitControls.update()
 
-const axesHelper = new AxesHelper(20)
-
-scene.add(axesHelper)
-
-camera.position.set(5, 5, 50)
-
-const boxGeometry = new BoxGeometry(7, 6, 4)
-const boxMaterial = new MeshBasicMaterial({ color: 0x20FFF1 })
-const box = new Mesh(boxGeometry, boxMaterial)
-
-const sphereGeometry = new SphereGeometry(3, 30, 30)
-const sphereMaterial = new MeshBasicMaterial({ 
-  color: 0x03123D,
-  wireframe: true
-})
-const sphere = new Mesh(sphereGeometry, sphereMaterial)
-sphere.position.set(10, 6, 0)
+const sphere = createSphere({})
 
 const planeGeometry = new PlaneGeometry(30, 30)
-const planeMaterial = new MeshBasicMaterial({ 
+const planeMaterial = new MeshStandardMaterial({ 
   color: 0xFFFFFF,
   side: DoubleSide
 })
 const plane = new Mesh(planeGeometry, planeMaterial)
 plane.rotation.x = -0.5 * Math.PI
+plane.receiveShadow = true
 
-const gui = new dat.GUI()
 
-const options = {
-  sphereColor: '#ff4321',
-  boxColor: '#004333',
-  sphereWireFrame: true
-}
+const ambientLight = new AmbientLight(0xFFFFFF)
 
-gui
-  .addColor(options, 'sphereColor')
-  .onChange(e => { sphere.material.color.set(e) })
+const directionalLight = new DirectionalLight(0xFFBFFF, 1.9)
+directionalLight.position.set(-30, 20, 10)
+directionalLight.castShadow = true
+directionalLight.shadow.camera.bottom = -5
 
-gui
-  .addColor(options, 'boxColor')
-  .onChange(e => { box.material.color.set(e) })
-
-gui
-  .add(options, 'sphereWireFrame')
-  .onChange(e => { sphere.material.wireframe = e })
-
-const gridHelper = new GridHelper(30, 30)
-
-scene.add(box)
+scene.add(ambientLight)
+scene.add(directionalLight)
+scene.add(axesHelper)
 scene.add(sphere)
 scene.add(plane)
 scene.add(gridHelper)
 
-const animateBox = time => {
-  box.rotation.x = time / 1000 * 0.5
-  box.rotation.y = time / 1000 * 2
-  box.rotation.z = time / 1000
+sphere.callback = () => sphereCb({ sphere, scene })
+
+window.addEventListener( 'click', e => onClick(e, renderer, pointer, raycaster, scene, camera))
+
+const animate = time => {
+  const spheres = scene.children.filter(item => isSphere(item))
+
+  spheres.forEach((item, i) => {
+    let speed = 0.01
+    let turn = !!i
+
+    item.step += speed
+    item.position.y = Math.abs(Math.sin(item.step) * 10)
+    item.position.x = Math.sin(item.step) * (turn ? 10 : -10)
+    
+    if (Math.sin(item.step) == 1 ) turn = !!turn
+  })
   
   renderer.render(scene, camera)
 }
 
-renderer.setAnimationLoop(animateBox)
+renderer.setAnimationLoop(animate)
