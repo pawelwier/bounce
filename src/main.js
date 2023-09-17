@@ -1,5 +1,5 @@
 import { WebGLRenderer, Scene, PerspectiveCamera, AxesHelper, AmbientLight, MeshStandardMaterial,
-  Mesh, PlaneGeometry, GridHelper, DoubleSide, SphereGeometry, DirectionalLight, Raycaster, Vector2
+  Mesh, PlaneGeometry, GridHelper, DoubleSide, DirectionalLight, Raycaster, Vector2
  } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { onClick } from './utils/listeners'
@@ -37,15 +37,12 @@ const planeMaterial = new MeshStandardMaterial({
 })
 const plane = new Mesh(planeGeometry, planeMaterial)
 plane.rotation.x = -0.5 * Math.PI
-plane.receiveShadow = true
 
 
 const ambientLight = new AmbientLight(0xFFFFFF)
 
 const directionalLight = new DirectionalLight(0xFFBFFF, 1.9)
 directionalLight.position.set(-30, 20, 10)
-directionalLight.castShadow = true
-directionalLight.shadow.camera.bottom = -5
 
 scene.add(ambientLight)
 scene.add(directionalLight)
@@ -54,11 +51,11 @@ scene.add(sphere)
 scene.add(plane)
 scene.add(gridHelper)
 
-sphere.callback = () => sphereCb({ sphere, scene })
+sphere.callback = () => { sphereCb({ sphere, scene }) }
 
 window.addEventListener( 'click', e => onClick(e, renderer, pointer, raycaster, scene, camera))
 
-const animate = time => {
+const animate = () => {
   const spheres = scene.children.filter(item => isSphere(item))
 
   spheres.forEach((item, i) => {
