@@ -1,7 +1,7 @@
 <script>
 import { onMount } from 'svelte'
 import { createScene } from '../three/main'
-import { getCanvasHeight } from '../three/config/initConfig'
+import { getCanvasHeight } from '../three/utils/htmlUtils'
 
 onMount(createScene)
 </script>

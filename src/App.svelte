@@ -8,5 +8,5 @@ import PageBody from './components/PageBody.svelte'
 <div class="main">
   <Header />
   <Canvas />
-  <!-- <PageBody /> -->
+  <PageBody />
 </div>

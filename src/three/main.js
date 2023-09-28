@@ -3,8 +3,9 @@ import {
 } from 'three'
 import { OrbitControls } from './OrbitControls'
 import { onClick, onWindowResize } from './utils/listeners'
-import { createSphere, isSphere, sphereCb } from './utils/geometry'
-import { initConfig, getCanvasHeight } from './config/initConfig'
+import { createSphere, getSpheres, isSphere, sphereOnClick } from './utils/geometry'
+import { getCanvasHeight, updateSphereCount } from './utils/htmlUtils'
+import { initConfig } from './config/initConfig'
 
 const { canvasWidth } = initConfig
 const { innerWidth, innerHeight } = window
@@ -43,7 +44,7 @@ const init = () => {
 }
 
 const animate = ({ renderer, camera, scene }) => {
-  const spheres = scene.children.filter(item => isSphere(item))
+  const spheres = getSpheres(scene)
 
   spheres.forEach((item, i) => {
     let speed = 0.01
@@ -65,7 +66,9 @@ export const createScene = () => {
 
   const sphere = createSphere({})
   scene.add(sphere)
-  sphere.callback = () => { sphereCb({ sphere, scene }) }
+  sphere.callback = () => { sphereOnClick({ sphere, scene }) }
+
+  updateSphereCount(scene)
 
   renderer.setAnimationLoop(() => animate({ renderer, camera, scene }))
 
