@@ -36,7 +36,7 @@ export const sphereCb = ({ sphere, scene }) => {
   const { parameters: { radius } } = geometry
   const iterations = [...Array(elementsOnClick)]
   iterations.forEach((_, i) => {
-    const newScale = (1 / elementsOnClick) * Math.sqrt(elementsOnClick) * scale.x  // x, y, z, are the same
+    const newScale = (1 / elementsOnClick) * 1.2 * Math.sqrt(elementsOnClick) * scale.x  // x, y, z, are the same
     const color = new Color(getRandomRgb())
 
     if (!i) {

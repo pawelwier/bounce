@@ -1,18 +1,19 @@
+import { 
+  WebGLRenderer, Scene, PerspectiveCamera, AmbientLight, DirectionalLight, Raycaster, Vector2
+} from 'three'
 import { OrbitControls } from './OrbitControls'
-import { WebGLRenderer, Scene, PerspectiveCamera, AmbientLight, DirectionalLight, Raycaster, Vector2
- } from 'three'
-import { onClick } from './utils/listeners'
+import { onClick, onWindowResize } from './utils/listeners'
 import { createSphere, isSphere, sphereCb } from './utils/geometry'
+import { initConfig, getCanvasHeight } from './config/initConfig'
 
+const { canvasWidth } = initConfig
 const { innerWidth, innerHeight } = window
 
 const init = () => {
   const renderer = new WebGLRenderer({ 
     antialias: true, 
-    canvas: document.getElementById('canvas') 
+    canvas: document.getElementById('canvas-main') 
   })
-  renderer.setSize(innerWidth, innerHeight)
-  
   const raycaster = new Raycaster()
   const scene = new Scene()
   const pointer = new Vector2()
@@ -22,21 +23,15 @@ const init = () => {
     0.1,
     1000
   )
-
-  camera.position.set(-10, 30, 30)
-
-  const sphere = createSphere({})
-
   const ambientLight = new AmbientLight(0xFFFFFF)
-
   const directionalLight = new DirectionalLight(0xFFBFFF, 1.9)
+    
+  renderer.setSize(canvasWidth, getCanvasHeight())
   directionalLight.position.set(-30, 20, 10)
+  camera.position.set(-10, 30, 30)
 
   scene.add(ambientLight)
   scene.add(directionalLight)
-  scene.add(sphere)
-
-  sphere.callback = () => { sphereCb({ sphere, scene }) }
 
   return {
     renderer,
@@ -47,8 +42,7 @@ const init = () => {
   }
 }
 
-
-const animate = ({renderer, camera, scene}) => {
+const animate = ({ renderer, camera, scene }) => {
   const spheres = scene.children.filter(item => isSphere(item))
 
   spheres.forEach((item, i) => {
@@ -65,24 +59,21 @@ const animate = ({renderer, camera, scene}) => {
   renderer.render(scene, camera)
 }
 
-const onWindowResize = ({ renderer, camera }) => {
-  camera.aspect = innerWidth / innerHeight
-  camera.updateProjectionMatrix()
-  renderer.setSize(innerWidth, innerHeight)
-
-}
-
 export const createScene = () => {
+  // TODO: clear scene before
   const { renderer, camera, scene, raycaster, pointer } = init()
 
-  renderer.setAnimationLoop(() => animate({renderer, camera, scene}))
+  const sphere = createSphere({})
+  scene.add(sphere)
+  sphere.callback = () => { sphereCb({ sphere, scene }) }
+
+  renderer.setAnimationLoop(() => animate({ renderer, camera, scene }))
 
   const orbitControls = new OrbitControls(camera, renderer.domElement)
   orbitControls.update()
 
-  document.body.appendChild(renderer.domElement)
-  
-  window.addEventListener( 'click', e => onClick(e, renderer, pointer, raycaster, scene, camera))
-  window.addEventListener('resize', () => onWindowResize({ renderer, camera }))
+  window.addEventListener('click', e => onClick(e, renderer, pointer, raycaster, scene, camera))
+  // TODO: fix and add
+  // window.addEventListener('resize', () => onWindowResize({ renderer, camera }))
 }
 

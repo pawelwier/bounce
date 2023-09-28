@@ -1,10 +1,12 @@
 <script>
-import { onMount } from 'svelte'
-import { createScene } from './three/main'
-
-onMount(createScene)
+import Canvas from './components/Canvas.svelte';
+import Header from './components/Header.svelte'
+import PageBody from './components/PageBody.svelte'
 </script>
 
-<button on:click={createScene}>Restart</button>
 
-<canvas	id='canvas'></canvas>
+<div class="main">
+  <Header />
+  <Canvas />
+  <!-- <PageBody /> -->
+</div>
