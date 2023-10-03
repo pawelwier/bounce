@@ -9,7 +9,7 @@ import { MenuActionType } from './data'
 export let action = MenuActionType.ADD
 
 $: isAddAction = action === MenuActionType.ADD
-$: symbol = isAddAction ? '+' : '-'
+$: symbol = isAddAction ? '+' : '−'
 $: isMinCount = $sceneStore ? getSpheres($sceneStore)?.length <= initConfig.minSphereCount : true
 $: disabled = isMinCount && !isAddAction
 
@@ -18,7 +18,6 @@ const removeBall = ({ sphere, scene }) => {
   return removeMeshObject({ scene, uuid: sphere?.uuid })
 }
 
-// TODO: fix ball onclick store update
 const onClick = () => {
   const sphere = getRandomSphere($sceneStore)
   const scene = isAddAction ? sphereOnClick({ sphere, scene: $sceneStore })
@@ -28,6 +27,7 @@ const onClick = () => {
 </script>
 
 <button
+  class="btn-main btn-sub-add"
   on:click={onClick}
   {disabled}
 >

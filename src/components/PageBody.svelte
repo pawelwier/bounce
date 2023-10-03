@@ -7,11 +7,13 @@ let count = 0
 
 <div class="page-main">
   <BallMenuBtn action={MenuActionType.SUB} />
-    <span>
-      Ball count: 
-    </span>
-    <span id="ball-count">
-      {count}
-    </span>
+    <div class="ball-count-text">
+      <span>
+        Ball count
+      </span>
+      <span id="ball-count">
+        {count}
+      </span>  
+    </div>    
   <BallMenuBtn />
 </div>

@@ -1,3 +1,4 @@
+/* common */
 html, body {
 	width: 100%;
 	height: 100%;
@@ -8,6 +9,17 @@ html, body {
 
 button {
 	cursor: pointer;
+	outline: none;
+	border: 0;
+}
+
+button:hover {
+	filter: brightness(1.2);
+}
+
+button:disabled {
+	opacity: 0.4;
+	cursor: default;
 }
 
 button,
@@ -23,6 +35,11 @@ button,
 	justify-content: center;
 	align-items: center;
 	padding: 2rem;
+}
+
+.btn-main {
+	background-color: rgb(8, 156, 156);
+	color: #FFF;
 }
 
 /* Header */
@@ -44,6 +61,7 @@ button,
 	height: 4rem;
 	margin: auto;
 	font-size: 2.5rem;
+	border-radius: 0.8rem;
 }
 
 /* Page */
@@ -55,4 +73,20 @@ button,
 	gap: 2rem;
 	background-color: #FFF;
 	padding: 2rem;
+}
+
+.ball-count-text {
+	font-size: 1.2rem;
+	margin: auto;
+	text-align: center;
+}
+
+#ball-count {
+	font-size: 2.2rem;
+}
+
+.btn-sub-add {
+	padding: 0.4rem 1.5rem;
+	font-size: 4rem;
+	border-radius: 100%;
 }

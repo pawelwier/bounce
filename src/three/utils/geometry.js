@@ -10,6 +10,11 @@ const getRandomRgb = () => (
   `rgb(${getRandomGgbValue()}, ${getRandomGgbValue()}, ${getRandomGgbValue()})`
 )
 
+const dispatchSceneUpdated = scene => {
+  const event = new CustomEvent('scene-updated', { detail: scene });
+  document.dispatchEvent(event);
+}
+
 export const isSphere = item => item?.geometry?.type === 'SphereGeometry'
 
 export const getSpheres = scene => scene.children.filter(item => isSphere(item)) || []
@@ -75,6 +80,7 @@ export const clearScene = scene => {
   uuids.forEach(uuid => {
     removeMeshObject({ scene, uuid })
   })
+  dispatchSceneUpdated(scene)
 }
 
 export const sphereOnClick = ({ sphere, scene }) => {
@@ -91,7 +97,8 @@ export const sphereOnClick = ({ sphere, scene }) => {
 
     /* add new sphere */
     addChildSphere({ sphere, scene })
+    dispatchSceneUpdated(scene)
   })
-  
+
   return scene
 }

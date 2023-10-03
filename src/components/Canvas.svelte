@@ -12,7 +12,10 @@ const resetScene = () => {
   addFirstSphere($sceneStore)
 }
 
-onMount(setScene)
+onMount(() => {
+  setScene()
+  document.addEventListener("scene-updated", e => { sceneStore.set(e.detail) })  
+})
 </script>
 
 <div 
@@ -20,5 +23,8 @@ onMount(setScene)
   style="grid-template-rows: {getCanvasHeight()}px 6rem;"
 >
   <canvas	id='canvas-main'></canvas>
-  <button on:click={resetScene}>Restart</button>
+  <button 
+    class="btn-main"  
+    on:click={resetScene}
+  >Restart</button>
 </div>
