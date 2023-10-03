@@ -10,6 +10,19 @@ const getRandomRgb = () => (
   `rgb(${getRandomGgbValue()}, ${getRandomGgbValue()}, ${getRandomGgbValue()})`
 )
 
+export const isSphere = item => item?.geometry?.type === 'SphereGeometry'
+
+export const getSpheres = scene => scene.children.filter(item => isSphere(item)) || []
+
+export const getRandomSphere = scene => {
+  const spheres = getSpheres(scene)
+  return spheres[Math.floor(Math.random() * spheres.length)]
+}
+
+export const getNewScale = sphere => (
+  (1 / elementsOnClick) * 1.2 * Math.sqrt(elementsOnClick) * sphere.scale.x  // x, y, z, are the same
+)
+
 export const createSphere = ({ radius = sphereRadius, color = sphereColor }) => {
   const sphereGeometry = new SphereGeometry(radius, 50, 50)
   const sphereMaterial = new MeshStandardMaterial({ 
@@ -23,49 +36,62 @@ export const createSphere = ({ radius = sphereRadius, color = sphereColor }) => 
   return sphere
 }
 
-// TODO: use later
+export const addFirstSphere = scene => {
+  const sphere = createSphere({})
+  sphere.callback = () => { sphereOnClick({ sphere, scene }) }
+  scene.add(sphere)
+  updateSphereCount(scene)
+}
+
+export const addChildSphere = ({ sphere, scene }) => {
+  const color = new Color(getRandomRgb())
+  const scale = getNewScale(sphere)
+  const { geometry: { parameters: { radius } } } = sphere
+  const newSphere = createSphere({ 
+    radius: scale * radius, 
+    color  
+  })
+  newSphere.step = sphere.step + (2 * elementsOnClick * scale)
+  newSphere.callback = () => { sphereOnClick({ sphere: newSphere, scene }) }
+  
+  scene.add(newSphere)
+  updateSphereCount(scene)
+
+  return scene
+}
+
 export const removeMeshObject = ({ scene, uuid }) => {
   const object = scene.getObjectByProperty('uuid', uuid)
   object.geometry.dispose()
   object.material.dispose()
   scene.remove(object)
+  updateSphereCount(scene)
+
+  return scene
 }
 
-export const isSphere = item => item?.geometry?.type === 'SphereGeometry'
-
-export const getSpheres = scene => scene.children.filter(item => isSphere(item)) || []
-
-export const getRandomSphere = scene => {
-  const spheres = getSpheres(scene)
-  return spheres[Math.floor(Math.random() * spheres.length)]
+export const clearScene = scene => {
+  const uuids = getSpheres(scene).map(({ uuid }) => uuid)
+  uuids.forEach(uuid => {
+    removeMeshObject({ scene, uuid })
+  })
 }
 
 export const sphereOnClick = ({ sphere, scene }) => {
-  const { geometry, uuid, scale } = sphere
-  const { parameters: { radius } } = geometry
   const iterations = [...Array(elementsOnClick)]
+  const newScale = getNewScale(sphere)
   iterations.forEach((_, i) => {
-    const newScale = (1 / elementsOnClick) * 1.2 * Math.sqrt(elementsOnClick) * scale.x  // x, y, z, are the same
-    const color = new Color(getRandomRgb())
 
     if (!i) {
       /* update first sphere */
-      const object = scene.getObjectByProperty('uuid', uuid)
-      object.scale.set(newScale, newScale, newScale),
-      object.color = color
+      const object = scene.getObjectByProperty('uuid', sphere.uuid)
+      object.scale.set(newScale, newScale, newScale)
       return
     }
 
-    /* add new spheres */
-    const newSphere = createSphere({ 
-      radius: newScale * radius, 
-      color  
-    })
-    newSphere.step = sphere.step + (2 * elementsOnClick * newScale)
-    newSphere.callback = () => { sphereOnClick({ sphere: newSphere, scene }) }
-    
-    scene.add(newSphere)
+    /* add new sphere */
+    addChildSphere({ sphere, scene })
   })
-
-  updateSphereCount(scene)
+  
+  return scene
 }

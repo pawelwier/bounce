@@ -1,9 +1,18 @@
 <script>
 import { onMount } from 'svelte'
+import { sceneStore } from '../stores/sceneStore'
 import { createScene } from '../three/main'
 import { getCanvasHeight } from '../three/utils/htmlUtils'
+import { addFirstSphere, clearScene } from '../three/utils/geometry'
 
-onMount(createScene)
+const setScene = () => { sceneStore.set(createScene()) }
+
+const resetScene = () => {
+  clearScene($sceneStore)
+  addFirstSphere($sceneStore)
+}
+
+onMount(setScene)
 </script>
 
 <div 
@@ -11,5 +20,5 @@ onMount(createScene)
   style="grid-template-rows: {getCanvasHeight()}px 6rem;"
 >
   <canvas	id='canvas-main'></canvas>
-  <button on:click={createScene}>Restart</button>
+  <button on:click={resetScene}>Restart</button>
 </div>

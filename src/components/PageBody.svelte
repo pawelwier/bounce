@@ -1,28 +1,17 @@
 <script>
+import BallMenuBtn from "./BallMenuBtn.svelte";
+import { MenuActionType } from "./data";
+
 let count = 0
-
-const onAddBall = () => {
-  // TODO: add ball from random one
-}
-
-const onRemoveBall = () => {
-  // TODO: remove random ball
-}
 </script>
 
 <div class="page-main">
-  <button
-    on:click={onRemoveBall}
-  >-</button>
-  <div>
+  <BallMenuBtn action={MenuActionType.SUB} />
     <span>
       Ball count: 
     </span>
     <span id="ball-count">
       {count}
     </span>
-  </div>
-  <button
-    on:click={onAddBall}
-  >+</button>
+  <BallMenuBtn />
 </div>

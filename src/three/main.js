@@ -3,14 +3,14 @@ import {
 } from 'three'
 import { OrbitControls } from './OrbitControls'
 import { onClick, onWindowResize } from './utils/listeners'
-import { createSphere, getSpheres, isSphere, sphereOnClick } from './utils/geometry'
-import { getCanvasHeight, updateSphereCount } from './utils/htmlUtils'
+import { addFirstSphere, getSpheres } from './utils/geometry'
+import { getCanvasHeight } from './utils/htmlUtils'
 import { initConfig } from './config/initConfig'
 
 const { canvasWidth } = initConfig
 const { innerWidth, innerHeight } = window
 
-const init = () => {
+const initSceneElements = () => {
   const renderer = new WebGLRenderer({ 
     antialias: true, 
     canvas: document.getElementById('canvas-main') 
@@ -43,7 +43,7 @@ const init = () => {
   }
 }
 
-const animate = ({ renderer, camera, scene }) => {
+const animateScene = ({ renderer, camera, scene }) => {
   const spheres = getSpheres(scene)
 
   spheres.forEach((item, i) => {
@@ -61,16 +61,11 @@ const animate = ({ renderer, camera, scene }) => {
 }
 
 export const createScene = () => {
-  // TODO: clear scene before
-  const { renderer, camera, scene, raycaster, pointer } = init()
+  const { renderer, camera, scene, raycaster, pointer } = initSceneElements()
 
-  const sphere = createSphere({})
-  scene.add(sphere)
-  sphere.callback = () => { sphereOnClick({ sphere, scene }) }
+  addFirstSphere(scene)
 
-  updateSphereCount(scene)
-
-  renderer.setAnimationLoop(() => animate({ renderer, camera, scene }))
+  renderer.setAnimationLoop(() => animateScene({ renderer, camera, scene }))
 
   const orbitControls = new OrbitControls(camera, renderer.domElement)
   orbitControls.update()
@@ -78,5 +73,7 @@ export const createScene = () => {
   window.addEventListener('click', e => onClick(e, renderer, pointer, raycaster, scene, camera))
   // TODO: fix and add
   // window.addEventListener('resize', () => onWindowResize({ renderer, camera }))
+
+  return scene
 }
 
